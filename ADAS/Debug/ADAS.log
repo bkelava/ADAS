@@ -1,0 +1,12 @@
+﻿  main.c
+C:\Users\KELAVA\source\repos\ADAS\ADAS\main.c(98,62): warning C4244: 'function': conversion from 'double' to 'size_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\main.c(106,62): warning C4244: 'function': conversion from 'double' to 'size_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\main.c(113,62): warning C4244: 'function': conversion from 'double' to 'size_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\main.c(130,67): warning C4244: 'function': conversion from 'double' to 'size_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\main.c(23,11): warning C4101: 'frameCount': unreferenced local variable
+  yuv.c
+C:\Users\KELAVA\source\repos\ADAS\ADAS\yuv.c(258,102): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\yuv.c(259,102): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
+C:\Users\KELAVA\source\repos\ADAS\ADAS\yuv.c(260,102): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
+  Generating Code...
+  ADAS.vcxproj -> C:\Users\KELAVA\source\repos\ADAS\Debug\ADAS.exe
