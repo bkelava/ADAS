@@ -36,7 +36,7 @@ double calculateBicubicValue(YUV** yuvOrigin, YUV_Double** yuv, YUV_Double** Ix,
 
 void createDerivative(YUV_Double** Ix, YUV_Double** Iy, YUV_Double** Ixy, YUV** yuv, int width, int height);
 
-double calculateBilinearValue(YUV** yuv, double I, double J, double xScale, double yScale, char channel);
+double calculateBilinearValue(YUV** yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel);
 
 int getFrameCount(char* filename, int frame_size);
 

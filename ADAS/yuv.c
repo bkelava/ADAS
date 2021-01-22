@@ -14,6 +14,8 @@ void allocateMatrix(YUV * **matrix, double WIDTH, double HEIGHT, double FACTOR)
 	int height_new = (int)(HEIGHT * FACTOR);
 	int width_new = (int)(WIDTH * FACTOR);
 
+	printf("allocating matrix uint8 type %d %d\n", height_new, width_new);
+
 	*matrix = (YUV * *)malloc(sizeof(YUV*) * height_new);
 	for (int i = 0; i < height_new; i++)
 	{
@@ -25,6 +27,8 @@ void allocateMatrixTypeDouble(YUV_Double * **matrix, double WIDTH, double HEIGHT
 {
 	int height_new = (int)(HEIGHT * FACTOR);
 	int width_new = (int)(WIDTH * FACTOR);
+
+	printf("allocating matrix double type %d %d\n", height_new, width_new);
 
 	*matrix = (YUV_Double * *)malloc(sizeof(YUV_Double*) * height_new);
 	for (int i = 0; i < height_new; i++)
@@ -174,11 +178,8 @@ void createOutput(uint8_t * bufferOut, YUV * yuvArray, double SIZE)
 
 void nearestNeighbourInterpolation(YUV * *originalMatrix, YUV * *matrix, double WIDTH, double HEIGHT, double FACTOR)
 {
-	double iCord = 0.0;
-	double jCord = 0.0;
-
-	double xScale = (WIDTH * FACTOR) / (WIDTH - 1.00);
-	double yScale = (HEIGHT * FACTOR) / (HEIGHT - 1.00);
+	int iCord = 0;
+	int jCord = 0;
 
 	int height_new = (int)(HEIGHT * FACTOR);
 	int width_new = (int)(WIDTH * FACTOR);
@@ -187,50 +188,66 @@ void nearestNeighbourInterpolation(YUV * *originalMatrix, YUV * *matrix, double 
 	{
 		for (int j = 0; j < width_new; j++)
 		{
-			double I = (double)i;
-			double J = (double)j;
+			iCord = (int)(i / FACTOR);
+			jCord = (int)(j / FACTOR);
 
-			iCord = round(I / yScale);
-			jCord = round(J / xScale);
-
-			matrix[i][j].y = originalMatrix[(int)iCord][(int)jCord].y;
-			matrix[i][j].u = originalMatrix[(int)iCord][(int)jCord].u;
-			matrix[i][j].v = originalMatrix[(int)iCord][(int)jCord].v;
+			matrix[i][j].y = originalMatrix[iCord][jCord].y;
+			matrix[i][j].u = originalMatrix[iCord][jCord].u;
+			matrix[i][j].v = originalMatrix[iCord][jCord].v;
 		}
 	}
 }
 
-double calculateBilinearValue(YUV * *yuv, double I, double J, double xScale, double yScale, char channel)
+double calculateBilinearValue(YUV * *yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel)
 {
+	int width = (int)WIDTH;
+	int height = (int)HEIGHT;
+
 	double q11 = 0, q12 = 0, q21 = 0, q22 = 0;
+	
+	double xScale = (WIDTH * SF) / (WIDTH - 1.00);
+	double yScale = (HEIGHT * SF) / (HEIGHT - 1.00);
+	
 	double W = -(((I / yScale) - floor(I / yScale)) - 1);
 	double H = -(((J / xScale) - floor(J / xScale)) - 1);
 
-	double iCordFloor = floor(I / yScale);
-	double jCordFloor = floor(J / xScale);
-	double iCordCeil = ceil(I / yScale);
-	double jCordCeil = ceil(J / xScale);
+	int iCordFloor = floor(I / SF);
+	int jCordFloor = floor(J / SF);
+	int iCordCeil = ceil(I / SF);
+	int jCordCeil = ceil(J / SF);
+
+	//if (((int)iCordCeil) >= height)
+	//{
+	//	iCordCeil = HEIGHT - 1.00;
+	//	jCordCeil = WIDTH - 1.00;
+	//}
+
+	if (iCordCeil >= height)
+	{
+		iCordCeil = height - 1.00;
+		jCordCeil = width - 1.00;
+	}
 
 	if (channel == 'y')
 	{
-		q11 = yuv[(int)iCordFloor][(int)jCordFloor].y;
-		q12 = yuv[(int)iCordCeil][(int)jCordFloor].y;
-		q21 = yuv[(int)iCordFloor][(int)jCordCeil].y;
-		q22 = yuv[(int)iCordCeil][(int)jCordCeil].y;
+		q11 = yuv[iCordFloor][jCordFloor].y;
+		q12 = yuv[iCordCeil][jCordFloor].y;
+		q21 = yuv[iCordFloor][jCordCeil].y;
+		q22 = yuv[iCordCeil][jCordCeil].y;
 	}
 	else if (channel == 'u')
 	{
-		q11 = yuv[(int)iCordFloor][(int)jCordFloor].u;
-		q12 = yuv[(int)iCordCeil][(int)jCordFloor].u;
-		q21 = yuv[(int)iCordFloor][(int)jCordCeil].u;
-		q22 = yuv[(int)iCordCeil][(int)jCordCeil].u;
+		q11 = yuv[iCordFloor][jCordFloor].u;
+		q12 = yuv[iCordCeil][jCordFloor].u;
+		q21 = yuv[iCordFloor][jCordCeil].u;
+		q22 = yuv[iCordCeil][jCordCeil].u;
 	}
 	else if (channel == 'v')
 	{
-		q11 = yuv[(int)iCordFloor][(int)jCordFloor].v;
-		q12 = yuv[(int)iCordCeil][(int)jCordFloor].v;
-		q21 = yuv[(int)iCordFloor][(int)jCordCeil].v;
-		q22 = yuv[(int)iCordCeil][(int)jCordCeil].v;
+		q11 = yuv[iCordFloor][jCordFloor].v;
+		q12 = yuv[iCordCeil][jCordFloor].v;
+		q21 = yuv[iCordFloor][jCordCeil].v;
+		q22 = yuv[iCordCeil][jCordCeil].v;
 	}
 	else
 	{
@@ -245,9 +262,6 @@ double calculateBilinearValue(YUV * *yuv, double I, double J, double xScale, dou
 
 void bilinearInterpolation(YUV * *originalMatrix, YUV * *matrix, double WIDTH, double HEIGHT, double FACTOR)
 {
-	double xScale = (WIDTH * FACTOR) / (WIDTH - 1.00);
-	double yScale = (HEIGHT * FACTOR) / (HEIGHT - 1.00);
-
 	int height_new = (int)(HEIGHT * FACTOR);
 	int width_new = (int)(WIDTH * FACTOR);
 
@@ -255,9 +269,9 @@ void bilinearInterpolation(YUV * *originalMatrix, YUV * *matrix, double WIDTH, d
 	{
 		for (int j = 0; j < width_new; j++)
 		{
-			matrix[i][j].y = calculateBilinearValue(originalMatrix, (double)i, (double)j, xScale, yScale, 'y');
-			matrix[i][j].u = calculateBilinearValue(originalMatrix, (double)i, (double)j, xScale, yScale, 'u');
-			matrix[i][j].v = calculateBilinearValue(originalMatrix, (double)i, (double)j, xScale, yScale, 'v');
+			matrix[i][j].y = calculateBilinearValue(originalMatrix, (double)i, (double)j, FACTOR, WIDTH, HEIGHT, 'y');
+			matrix[i][j].u = calculateBilinearValue(originalMatrix, (double)i, (double)j, FACTOR, WIDTH, HEIGHT, 'u');
+			matrix[i][j].v = calculateBilinearValue(originalMatrix, (double)i, (double)j, FACTOR, WIDTH, HEIGHT, 'v');
 		}
 	}
 }
@@ -499,3 +513,138 @@ uint8_t * getFrameFromVideo(char* fileForRead, int frameSize, int frameNumber) {
 
 	return frame;
 }
+
+
+
+//
+//if (channel == 'y')
+//{
+//	q11 = yuv[iCordFloor][jCordFloor].y;
+//	q12 = yuv[iCordCeil][jCordFloor].y;
+//	q21 = yuv[iCordFloor][jCordCeil].y;
+//	q22 = yuv[iCordCeil][jCordCeil].y;
+//}
+//else if (channel == 'u')
+//{
+//	q11 = yuv[iCordFloor][jCordFloor].u;
+//	q12 = yuv[iCordCeil][jCordFloor].u;
+//	q21 = yuv[iCordFloor][jCordCeil].u;
+//	q22 = yuv[iCordCeil][jCordCeil].u;
+//}
+//else if (channel == 'v')
+//{
+//	q11 = yuv[iCordFloor][jCordFloor].v;
+//	q12 = yuv[iCordCeil][jCordFloor].v;
+//	q21 = yuv[iCordFloor][jCordCeil].v;
+//	q22 = yuv[iCordCeil][jCordCeil].v;
+//}
+//else
+//{
+//	printf("WRONG CHANNEL \n");
+//	exit(0);
+//}
+
+
+//double calculateBilinearValue(YUV** yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel)
+//{
+//	int width = (int)WIDTH;
+//	int height = (int)HEIGHT;
+//
+//	double q11 = 0, q12 = 0, q21 = 0, q22 = 0;
+//
+//	double xScale = (WIDTH * SF) / (WIDTH - 1.00);
+//	double yScale = (HEIGHT * SF) / (HEIGHT - 1.00);
+//
+//	double W = -(((I / yScale) - floor(I / yScale)) - 1);
+//	double H = -(((J / xScale) - floor(J / xScale)) - 1);
+//
+//	double iCordFloor = floor(I / yScale);
+//	double jCordFloor = floor(J / xScale);
+//	double iCordCeil = ceil(I / yScale);
+//	double jCordCeil = ceil(J / xScale);
+//
+//	if (channel == 'y')
+//	{
+//		q11 = yuv[(int)iCordFloor][(int)jCordFloor].y;
+//		q12 = yuv[(int)iCordCeil][(int)jCordFloor].y;
+//		q21 = yuv[(int)iCordFloor][(int)jCordCeil].y;
+//		q22 = yuv[(int)iCordCeil][(int)jCordCeil].y;
+//	}
+//	else if (channel == 'u')
+//	{
+//		q11 = yuv[(int)iCordFloor][(int)jCordFloor].u;
+//		q12 = yuv[(int)iCordCeil][(int)jCordFloor].u;
+//		q21 = yuv[(int)iCordFloor][(int)jCordCeil].u;
+//		q22 = yuv[(int)iCordCeil][(int)jCordCeil].u;
+//	}
+//	else if (channel == 'v')
+//	{
+//		q11 = yuv[(int)iCordFloor][(int)jCordFloor].v;
+//		q12 = yuv[(int)iCordCeil][(int)jCordFloor].v;
+//		q21 = yuv[(int)iCordFloor][(int)jCordCeil].v;
+//		q22 = yuv[(int)iCordCeil][(int)jCordCeil].v;
+//	}
+//	else
+//	{
+//		printf("WRONG CHANNEL \n");
+//		exit(0);
+//	}
+//
+//	double result = (1 - W) * (1 - H) * q22 + W * (1 - H) * q21 + (1 - W) * H * q12 + W * H * q11;
+//
+//	return result;
+//}
+
+//double calculateBilinearValue(YUV** yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel)
+//{
+//	int width = (int)WIDTH; /*potential*/
+//	int height = (int)HEIGHT;
+//
+//	double q11 = 0, q12 = 0, q21 = 0, q22 = 0;
+//
+//	double xScale = (WIDTH * SF) / (WIDTH - 1.00);
+//	double yScale = (HEIGHT * SF) / (HEIGHT - 1.00);
+//
+//	double W = -(((I / yScale) - floor(I / yScale)) - 1);
+//	double H = -(((J / xScale) - floor(J / xScale)) - 1);
+//
+//	int iCordFloor = (int)floor(I / SF);
+//	int jCordFloor = (int)floor(J / SF);
+//	int iCordCeil = (int)ceil(I / SF);
+//	int jCordCeil = (int)ceil(I / SF);
+//
+//	if (iCordCeil >= height)
+//	{
+//		iCordCeil = height - 1;
+//	}
+//	if (channel == 'y')
+//	{
+//		q11 = yuv[iCordFloor][jCordFloor].y;
+//		q12 = yuv[iCordCeil][jCordFloor].y;
+//		q21 = yuv[iCordFloor][jCordCeil].y;
+//		q22 = yuv[iCordCeil][jCordCeil].y;
+//	}
+//	else if (channel == 'u')
+//	{
+//		q11 = yuv[iCordFloor][jCordFloor].u;
+//		q12 = yuv[iCordCeil][jCordFloor].u;
+//		q21 = yuv[iCordFloor][jCordCeil].u;
+//		q22 = yuv[iCordCeil][jCordCeil].u;
+//	}
+//	else if (channel == 'v')
+//	{
+//		q11 = yuv[iCordFloor][jCordFloor].v;
+//		q12 = yuv[iCordCeil][jCordFloor].v;
+//		q21 = yuv[iCordFloor][jCordCeil].v;
+//		q22 = yuv[iCordCeil][jCordCeil].v;
+//	}
+//	else
+//	{
+//		printf("WRONG CHANNEL \n");
+//		exit(0);
+//	}
+//
+//	double result = (1 - W) * (1 - H) * q22 + W * (1 - H) * q21 + (1 - W) * H * q12 + W * H * q11;
+//
+//	return result;
+//}
