@@ -198,56 +198,44 @@ void nearestNeighbourInterpolation(YUV * *originalMatrix, YUV * *matrix, double 
 	}
 }
 
-double calculateBilinearValue(YUV * *yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel)
+double calculateBilinearValue(YUV** yuv, double I, double J, double SF, double WIDTH, double HEIGHT, char channel)
 {
 	int width = (int)WIDTH;
 	int height = (int)HEIGHT;
-
-	double q11 = 0, q12 = 0, q21 = 0, q22 = 0;
+	
+	int q11 = 0, q12 = 0, q21 = 0, q22 = 0;
 	
 	double xScale = (WIDTH * SF) / (WIDTH - 1.00);
 	double yScale = (HEIGHT * SF) / (HEIGHT - 1.00);
 	
 	double W = -(((I / yScale) - floor(I / yScale)) - 1);
 	double H = -(((J / xScale) - floor(J / xScale)) - 1);
-
-	int iCordFloor = floor(I / SF);
-	int jCordFloor = floor(J / SF);
-	int iCordCeil = ceil(I / SF);
-	int jCordCeil = ceil(J / SF);
-
-	//if (((int)iCordCeil) >= height)
-	//{
-	//	iCordCeil = HEIGHT - 1.00;
-	//	jCordCeil = WIDTH - 1.00;
-	//}
-
-	if (iCordCeil >= height)
-	{
-		iCordCeil = height - 1.00;
-		jCordCeil = width - 1.00;
-	}
-
+	
+	double iCordFloor = floor(I / yScale);
+	double jCordFloor = floor(J / xScale);
+	double iCordCeil = ceil(I / yScale);
+	double jCordCeil = ceil(J / xScale);
+	
 	if (channel == 'y')
 	{
-		q11 = yuv[iCordFloor][jCordFloor].y;
-		q12 = yuv[iCordCeil][jCordFloor].y;
-		q21 = yuv[iCordFloor][jCordCeil].y;
-		q22 = yuv[iCordCeil][jCordCeil].y;
+		q11 = yuv[(int)iCordFloor][(int)jCordFloor].y;
+		q12 = yuv[(int)iCordCeil][(int)jCordFloor].y;
+		q21 = yuv[(int)iCordFloor][(int)jCordCeil].y;
+		q22 = yuv[(int)iCordCeil][(int)jCordCeil].y;
 	}
 	else if (channel == 'u')
 	{
-		q11 = yuv[iCordFloor][jCordFloor].u;
-		q12 = yuv[iCordCeil][jCordFloor].u;
-		q21 = yuv[iCordFloor][jCordCeil].u;
-		q22 = yuv[iCordCeil][jCordCeil].u;
+		q11 = yuv[(int)iCordFloor][(int)jCordFloor].u;
+		q12 = yuv[(int)iCordCeil][(int)jCordFloor].u;
+		q21 = yuv[(int)iCordFloor][(int)jCordCeil].u;
+		q22 = yuv[(int)iCordCeil][(int)jCordCeil].u;
 	}
 	else if (channel == 'v')
 	{
-		q11 = yuv[iCordFloor][jCordFloor].v;
-		q12 = yuv[iCordCeil][jCordFloor].v;
-		q21 = yuv[iCordFloor][jCordCeil].v;
-		q22 = yuv[iCordCeil][jCordCeil].v;
+		q11 = yuv[(int)iCordFloor][(int)jCordFloor].v;
+		q12 = yuv[(int)iCordCeil][(int)jCordFloor].v;
+		q21 = yuv[(int)iCordFloor][(int)jCordCeil].v;
+		q22 = yuv[(int)iCordCeil][(int)jCordCeil].v;
 	}
 	else
 	{
@@ -255,7 +243,12 @@ double calculateBilinearValue(YUV * *yuv, double I, double J, double SF, double 
 		exit(0);
 	}
 
-	double result = (1 - W) * (1 - H) * q22 + W * (1 - H) * q21 + (1 - W) * H * q12 + W * H * q11;
+	//printf("%d %d %d %d\n", q11, q21, q12, q22);
+
+	double result = ((1 - W) * (1 - H) * q22) + (W * (1 - H) * q21) + ((1 - W) * H * q12) + (W * H * q11);
+
+	//if (channel == 'y')
+	//	printf("%d %d -- %.4f \n", (int)I, (int)J, result);
 
 	return result;
 }
@@ -361,9 +354,12 @@ double calculateBicubicValue(YUV** yuvOrigin, YUV_Double * *yuv, YUV_Double * *I
 	//if (channel == 'y') {
 	//	printf("temp %f tempClip %f\n", temp, clip(temp));
 	//}
-	temp = clip(temp);
+	//temp = clip(temp);
 
-	temp = round(temp);
+	//temp = round(temp);
+
+	if (channel == 'y')
+		printf("%.0f %.0f %f\n",I, J, temp);
 
 	return temp;
 }

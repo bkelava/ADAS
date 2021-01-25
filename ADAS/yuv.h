@@ -11,6 +11,8 @@
 
 #define clip(var) ((var >= 255.00) ? 255.00: (var<=0.00)?0:var)
 
+#define getByte(value, n) (value >> (n*8) & 0xFF)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
