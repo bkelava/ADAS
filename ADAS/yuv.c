@@ -358,8 +358,8 @@ double calculateBicubicValue(YUV** yuvOrigin, YUV_Double * *yuv, YUV_Double * *I
 
 	//temp = round(temp);
 
-	if (channel == 'y')
-		printf("%.0f %.0f %f\n",I, J, temp);
+	//if (channel == 'y')
+	//	printf("%.0f %.0f %f\n",I, J, temp);
 
 	return temp;
 }

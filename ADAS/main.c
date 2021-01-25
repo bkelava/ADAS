@@ -26,6 +26,8 @@ int main()
 	yuv[3][1].y = 3;
 	yuv[3][2].y = 5;
 	yuv[3][3].y = 7;
+
+
 	for (int i=0;i<4;i++)
 		for (int j = 0; j < 4; j++)
 		{

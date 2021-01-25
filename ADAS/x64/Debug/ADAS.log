@@ -1,5 +1,1 @@
-﻿  yuv.c
-C:\Users\kelava\source\repos\ADAS\ADAS\yuv.c(265): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
-C:\Users\kelava\source\repos\ADAS\ADAS\yuv.c(266): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
-C:\Users\kelava\source\repos\ADAS\ADAS\yuv.c(267): warning C4244: '=': conversion from 'double' to 'uint8_t', possible loss of data
-  ADAS.vcxproj -> C:\Users\kelava\source\repos\ADAS\x64\Debug\ADAS.exe
+﻿
