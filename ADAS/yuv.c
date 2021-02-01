@@ -243,12 +243,10 @@ double calculateBilinearValue(YUV** yuv, double I, double J, double SF, double W
 		exit(0);
 	}
 
-	//printf("%d %d %d %d\n", q11, q21, q12, q22);
-
 	double result = ((1 - W) * (1 - H) * q22) + (W * (1 - H) * q21) + ((1 - W) * H * q12) + (W * H * q11);
 
-	//if (channel == 'y')
-	//	printf("%d %d -- %.4f \n", (int)I, (int)J, result);
+	if (channel == 'y')
+		printf("%d %d -- %.4f \n", (int)I, (int)J, result);
 
 	return result;
 }
@@ -351,15 +349,8 @@ double calculateBicubicValue(YUV** yuvOrigin, YUV_Double * *yuv, YUV_Double * *I
 		temp = temp + alpha[f] * (pow(1 - W, w_temp) * pow(1 - H, h_temp));
 	}
 
-	//if (channel == 'y') {
-	//	printf("temp %f tempClip %f\n", temp, clip(temp));
-	//}
-	//temp = clip(temp);
-
-	//temp = round(temp);
-
-	//if (channel == 'y')
-	//	printf("%.0f %.0f %f\n",I, J, temp);
+	if (channel == 'y')
+		printf("%.0f %.0f %f\n",I, J, temp);
 
 	return temp;
 }
@@ -381,13 +372,6 @@ void bicubicInterpolation(YUV * *originalMatrix, YUV * *matrix, double WIDTH, do
 
 	createDerivative(Ix, Iy, Ixy, originalMatrix, (int)WIDTH, (int)HEIGHT);
 	convertYUVtoYUVDouble(originalMatrix, yuvDouble, (int)WIDTH, (int)HEIGHT);
-
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	for (int j = 0; j < 4; j++)
-	//		printf("%.2lf ", Ixy[i][j].y);
-	//	printf("\n");
-	//}
 
 	for (int i = 0; i < height_new; i++)
 	{

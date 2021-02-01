@@ -38,8 +38,8 @@ int main()
 	YUV** res;
 	allocateMatrix(&res, 4.0, 4.0, 2.0);
 
-	//bilinearInterpolation(yuv, res, 4.0, 4.0, 2.0);
-	bicubicInterpolation(yuv, res, 4.0, 4.0, 2.0);
+	bilinearInterpolation(yuv, res, 4.0, 4.0, 2.0);
+	//bicubicInterpolation(yuv, res, 4.0, 4.0, 2.0);
 
 	return 0;
 }
